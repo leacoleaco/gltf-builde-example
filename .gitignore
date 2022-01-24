@@ -1,0 +1,11 @@
+/build/
+/.gradle/
+/.idea/
+/.nb-gradle/
+/bin/
+/.settings/
+/.classpath
+/.project
+/.vscode/
+/target/
+/*.stl

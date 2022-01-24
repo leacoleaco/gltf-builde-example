@@ -1,0 +1,23 @@
+sudo: false
+
+language: java
+jdk:
+  #- oraclejdk8
+  #- oraclejdk9
+  - openjdk11
+  - openjdk12
+  # - oraclejdk10 openjdk 10 is broken on travis (maybe they use the wrong download link?)
+  
+# before_install:
+#   - "export DISPLAY=:99.0"
+#   - "export TERM=dumb"
+#   - "sh -e /etc/init.d/xvfb start"
+
+install:
+    - TERM=dumb ./gradlew --refresh-dependencies --stacktrace
+
+script:
+    - TERM=dumb ./gradlew build --stacktrace
+
+after_failure:
+  - "cat ./build/test-results/*.xml"
