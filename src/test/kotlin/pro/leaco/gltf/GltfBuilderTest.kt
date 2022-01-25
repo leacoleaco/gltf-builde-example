@@ -1,4 +1,4 @@
-package pro.leaco.gltf.test
+package pro.leaco.gltf
 
 import org.junit.Test
 import pro.leaco.gltf.GltfBuilder

@@ -1,4 +1,4 @@
-package pro.leaco.gltf.test.demo
+package pro.leaco.gltf.demo
 
 import de.javagl.jgltf.impl.v2.Material
 import org.junit.Before

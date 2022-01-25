@@ -1,7 +1,6 @@
-package pro.leaco.gltf.test.demo
+package pro.leaco.gltf.demo
 
 import de.javagl.jgltf.impl.v2.Mesh
-import de.javagl.jgltf.impl.v2.Node
 import pro.leaco.gltf.GltfBuilder
 import org.junit.Test
 import org.slf4j.LoggerFactory
@@ -52,7 +51,7 @@ class TestLineModels {
         val mesh: Mesh = builder.gltf.meshes[meshIdx]
         val primitive = mesh.primitives[0]
         primitive.extras = arrayOf("some", "additional", "data")
-        val outFile: File = TestShapeModels.Companion.getFile(meshBuilder.name)
+        val outFile: File = TestShapeModels.getFile(meshBuilder.name)
         builder.writeGltf(outFile)
         LOG.info("Finished generating: {}", outFile)
     }

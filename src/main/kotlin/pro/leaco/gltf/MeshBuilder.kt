@@ -109,6 +109,22 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
         return this
     }
 
+    /**
+     * Convert a 2D vertex array into a mesh. If null vertex values are encountered then related
+     * parts of the mesh will not be generated.
+     * @param meshGridProvider 2D Vertex array that represents the mesh.
+     * @param isTextured Indicates if texture coordinates should be generated.
+     * @param wrapY Wrap the mesh about the Y axis.
+     * @param wrapX Wrap the mesh about the X axis.
+     */
+    fun addGrid(
+        isTextured: Boolean,
+        wrapY: Boolean,
+        wrapX: Boolean,
+        meshGridProvider: MeshBuilder.() -> Array<Array<MeshVertex>>,
+    ): MeshBuilder {
+        return addGrid(meshGridProvider.invoke(this), isTextured, wrapY, wrapX)
+    }
 
     /**
      * Convert a 2D vertex array into a mesh. If null vertex values are encountered then related
@@ -119,7 +135,9 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
      * @param wrapX Wrap the mesh about the X axis.
      */
     fun addGrid(
-        meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean, wrapY: Boolean,
+        meshGrid: Array<Array<MeshVertex>>,
+        isTextured: Boolean,
+        wrapY: Boolean,
         wrapX: Boolean,
     ): MeshBuilder {
         val xGridSize = meshGrid.size
@@ -191,7 +209,7 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
             // Suppress generation of normals because we want to use the normals from the original
             // grid. We render the mesh with no wrapping because the start and end points overlap.
             supressNormals(true)
-            renderMesh(texGrid, false, false)
+            renderMesh(texGrid, wrapY = false, wrapX = false)
             supressNormals(false)
         }
         return this
@@ -248,8 +266,9 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
         bottomPos.sub(Point3f(0f, height, 0f))
 
         // add cylinder
-        val cylinderGrid: Array<Array<MeshVertex>> = arrayOf(newCircleVerticesXZ(position, radius, sides, color),
-            newCircleVerticesXZ(bottomPos, radius, sides, color))
+        val cylinderGrid: Array<Array<MeshVertex>> =
+            arrayOf(newCircleVerticesXZ(position, radius, sides, color),
+                newCircleVerticesXZ(bottomPos, radius, sides, color))
         addLathe(cylinderGrid, false)
 
         // add top and bottom
