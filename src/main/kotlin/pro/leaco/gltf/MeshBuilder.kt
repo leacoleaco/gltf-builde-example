@@ -1,7 +1,6 @@
 package pro.leaco.gltf
 
 import de.javagl.jgltf.impl.v2.Material
-import de.javagl.jgltf.impl.v2.MeshPrimitive
 import mu.KotlinLogging
 import java.awt.Color
 import javax.vecmath.Point2f
@@ -78,6 +77,18 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
     }
 
     /**
+     * Join the ends of a 2D surface along the y-axis to create a cylindrical shape as if
+     * cut from a lathe.
+     * @param meshGridSupplier 2D array containing vertices
+     * @param isTextured Indicates if this mesh will have a texture
+     */
+    fun addLathe(isTextured: Boolean, meshGridSupplier: MeshBuilder.() -> Array<Array<MeshVertex>>): MeshBuilder {
+        addLathe(meshGridSupplier.invoke(this), isTextured)
+        return this
+    }
+
+
+    /**
      * Join the ends of a 2D surface along the x-axis and y-axis to create a closed manifold.
      * @param meshGrid 2D array containing vertices
      * @param isTextured Indicates if this mesh will have a texture
@@ -86,6 +97,18 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
         addGrid(meshGrid, isTextured, wrapY = true, wrapX = true)
         return this
     }
+
+    /**
+     * Join the ends of a 2D surface along the y-axis to create a cylindrical shape as if
+     * cut from a lathe.
+     * @param meshGridSupplier 2D array containing vertices
+     * @param isTextured Indicates if this mesh will have a texture
+     */
+    fun addManifold(isTextured: Boolean, meshGridSupplier: MeshBuilder.() -> Array<Array<MeshVertex>>): MeshBuilder {
+        addManifold(meshGridSupplier.invoke(this), isTextured)
+        return this
+    }
+
 
     /**
      * Convert a 2D vertex array into a mesh. If null vertex values are encountered then related
