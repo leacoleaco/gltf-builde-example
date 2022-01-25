@@ -44,22 +44,22 @@ class GltfBuilder {
     }
 
     companion object {
-        private const val FILTER_LINEAR = 9729
-        private const val WRAP_CLAMP_TO_EDGE = 33071
-        private const val MAX_BUFFER_SIZE = 50 * 1024 * 1024
+        private const val FILTERLINEAR = 9729
+        private const val WRAPCLAMPTOEDGE = 33071
+        private const val MAXBUFFERSIZE = 50 * 1024 * 1024
     }
 
     /**
      * Buffer used for primitive serialization.  */
-    val buffer: ByteBuffer = Buffers.create(MAX_BUFFER_SIZE)
+    val buffer: ByteBuffer = Buffers.create(MAXBUFFERSIZE)
 
     /**
      * Get the GlTF used for writing metadata.
      */
-    private val gltf = GlTF()
+    val gltf = GlTF()
 
     /** Contains metadata for the glTF Asset type  */
-    private val _metaParams: MutableMap<String, Any> = TreeMap<String, Any>()
+    private val metaParams: MutableMap<String, Any> = TreeMap<String, Any>()
 
     /** The one and only Scene.  */
     private val topScene = Scene()
@@ -82,32 +82,32 @@ class GltfBuilder {
     /**
      * Set path for resolving images.
      */
-    fun setBasePath(_path: File) {
-        basePath = _path.path
+    fun setBasePath(path: File) {
+        basePath = path.path
     }
 
     /**
      * Set extra metadata in the glTF Asset.
      */
-    fun setMetaParam(_key: String, _value: Any) {
-        _metaParams[_key] = _value
+    fun setMetaParam(key: String, value: Any) {
+        metaParams[key] = value
     }
 
     /**
      * Set the copyright in the glTF Asset.
      */
-    fun setCopyright(_value: String) {
-        copyright = _value
+    fun setCopyright(value: String) {
+        copyright = value
     }
 
     /**
      * Add a node to the default Scene. This is the only way this class supports adding of
      * geometry.
      */
-    fun addNode(_node: Node) {
-        gltf.addNodes(_node)
+    fun addNode(node: Node) {
+        gltf.addNodes(node)
         val gltfList = gltf.nodes
-        topScene.addNodes(gltfList.indexOf(_node))
+        topScene.addNodes(gltfList.indexOf(node))
     }
 
     /**
@@ -122,20 +122,20 @@ class GltfBuilder {
 
     /**
      * Add a material with optional texture.
-     * @param _imageFile The image to use for the texture or null if none.
+     * @param imageFile The image to use for the texture or null if none.
      */
-    fun newTextureMaterial(_imageFile: String?): Material {
+    fun newTextureMaterial(imageFile: String?): Material {
         val material = newMaterial()
         val sampler = Sampler()
         gltf.addSamplers(sampler)
-        sampler.magFilter = FILTER_LINEAR
-        sampler.minFilter = FILTER_LINEAR
-        sampler.wrapS = WRAP_CLAMP_TO_EDGE
-        sampler.wrapT = WRAP_CLAMP_TO_EDGE
+        sampler.magFilter = FILTERLINEAR
+        sampler.minFilter = FILTERLINEAR
+        sampler.wrapS = WRAPCLAMPTOEDGE
+        sampler.wrapT = WRAPCLAMPTOEDGE
         val image = Image()
         gltf.addImages(image)
-        image.name = _imageFile
-        image.uri = _imageFile
+        image.name = imageFile
+        image.uri = imageFile
         val texture = Texture()
         gltf.addTextures(texture)
         texture.sampler = gltf.samplers.indexOf(sampler)
@@ -146,7 +146,7 @@ class GltfBuilder {
 
         val roughness: MaterialPbrMetallicRoughness = material.pbrMetallicRoughness
         roughness.baseColorTexture = texInfo
-        material.name = _imageFile
+        material.name = imageFile
 
         return material
     }
@@ -180,18 +180,18 @@ class GltfBuilder {
 
     /**
      * Write gltf to an OutputStream. Specify gltf or glb format.
-     * @param _format Indicates if this is JSON or binary format.
+     * @param format Indicates if this is JSON or binary format.
      */
     @Throws(Exception::class)
-    fun writeGltf(_os: OutputStream?, _format: GltfFormat) {
+    fun writeGltf(os: OutputStream?, format: GltfFormat) {
         val gltfModel: GltfModelV2 = gltfModel
         val gltfModelWriter = GltfModelWriter()
-        when (_format) {
+        when (format) {
             GltfFormat.GLTF -> {
-                gltfModelWriter.writeEmbedded(gltfModel, _os)
+                gltfModelWriter.writeEmbedded(gltfModel, os)
             }
             GltfFormat.GLB -> {
-                gltfModelWriter.writeBinary(gltfModel, _os)
+                gltfModelWriter.writeBinary(gltfModel, os)
             }
         }
     }
@@ -233,7 +233,7 @@ class GltfBuilder {
         asset.version = "2.0"
         asset.generator = generator
         asset.copyright = copyright
-        asset.extras = _metaParams
+        asset.extras = metaParams
 
         // flip the buffer for read
         buffer.flip()
@@ -252,12 +252,12 @@ class GltfBuilder {
         return gltfAsset
     }
 
-    private fun resolveImages(_gltfAsset: GltfAssetV2) {
-        val refList: List<GltfReference> = _gltfAsset.getImageReferences()
+    private fun resolveImages(gltfAsset: GltfAssetV2) {
+        val refList: List<GltfReference> = gltfAsset.getImageReferences()
         val baseUri: URI = Paths.get(basePath).toAbsolutePath().toUri()
         GltfReferenceResolver.resolveAll(refList, baseUri)
-//        val _refDatas: Map<String, ByteBuffer> = _gltfAsset.getReferenceDatas()
-//        for ((key, value) in _refDatas) {
+//        val refDatas: Map<String, ByteBuffer> = gltfAsset.getReferenceDatas()
+//        for ((key, value) in refDatas) {
 //            LOG.debug("Image[{}]: <{} bytes>", key, value.remaining())
 //        }
     }
