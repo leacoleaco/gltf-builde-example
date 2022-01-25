@@ -81,23 +81,27 @@ class GltfBuilder {
 
     /**
      * Set path for resolving images.
+     * finding textures etc.
      */
-    fun setBasePath(path: File) {
+    fun withBasePath(path: File): GltfBuilder {
         basePath = path.path
+        return this
     }
 
     /**
      * Set extra metadata in the glTF Asset.
      */
-    fun setMetaParam(key: String, value: Any) {
+    fun withMetaParam(key: String, value: Any): GltfBuilder {
         metaParams[key] = value
+        return this
     }
 
     /**
      * Set the copyright in the glTF Asset.
      */
-    fun setCopyright(value: String) {
+    fun withCopyright(value: String): GltfBuilder {
         copyright = value
+        return this
     }
 
     /**
@@ -262,4 +266,8 @@ class GltfBuilder {
 //        }
     }
 
+}
+
+fun GltfBuilder.buildNodeWith(meshBuilder: TopologyBuilder): Node {
+    return meshBuilder.build(this)
 }

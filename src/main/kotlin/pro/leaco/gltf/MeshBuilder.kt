@@ -1,5 +1,7 @@
 package pro.leaco.gltf
 
+import de.javagl.jgltf.impl.v2.Material
+import de.javagl.jgltf.impl.v2.MeshPrimitive
 import mu.KotlinLogging
 import java.awt.Color
 import javax.vecmath.Point2f
@@ -15,13 +17,53 @@ private val LOG = KotlinLogging.logger {}
  * @author Leaco
  */
 class MeshBuilder(name: String) : TriangleBuilder(name) {
+    companion object {
+
+        /**
+         * Helper function for interpolation between bounds returning a float.
+         * @param max Maximum bound
+         * @param part Number of parts
+         * @param idx Part index
+         * @return float representing position given by the index.
+         */
+        fun interpolateFloat(max: Int, part: Float, idx: Int): Float {
+            return (idx * part / max)
+        }
+
+        /**
+         * Helper function for interpolation between bounds returning an int.
+         * @param max Maximum bound
+         * @param part Number of parts
+         * @param idx Part index
+         * @return rounded integer representing position given by the index.
+         */
+        fun interpolateInt(max: Int, part: Float, idx: Int): Int {
+            return (idx * part / max).roundToInt()
+        }
+    }
+
+    override fun withMaterial(material: Material): MeshBuilder {
+        super.withMaterial(material)
+        return this
+    }
+
     /**
      * Create a an elevated surface from a 2D array.
      * @param meshGrid 2D array containing vertices
      * @param isTextured Indicates if this mesh will have a texture
      */
-    fun addPlane(meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean) {
+    fun addPlane(meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean): MeshBuilder {
         addGrid(meshGrid, isTextured, wrapY = false, wrapX = false)
+        return this
+    }
+
+    /**
+     * Create a an elevated surface from a 2D array.
+     * @param isTextured Indicates if this mesh will have a texture
+     */
+    fun addPlane(isTextured: Boolean, meshGridSupplier: MeshBuilder.() -> Array<Array<MeshVertex>>): MeshBuilder {
+        addPlane(meshGridSupplier.invoke(this), isTextured)
+        return this
     }
 
     /**
@@ -30,8 +72,9 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
      * @param meshGrid 2D array containing vertices
      * @param isTextured Indicates if this mesh will have a texture
      */
-    fun addLathe(meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean) {
+    fun addLathe(meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean): MeshBuilder {
         addGrid(meshGrid, isTextured, wrapY = true, wrapX = false)
+        return this
     }
 
     /**
@@ -39,8 +82,9 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
      * @param meshGrid 2D array containing vertices
      * @param isTextured Indicates if this mesh will have a texture
      */
-    fun addManifold(meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean) {
+    fun addManifold(meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean): MeshBuilder {
         addGrid(meshGrid, isTextured, wrapY = true, wrapX = true)
+        return this
     }
 
     /**
@@ -54,7 +98,7 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
     fun addGrid(
         meshGrid: Array<Array<MeshVertex>>, isTextured: Boolean, wrapY: Boolean,
         wrapX: Boolean,
-    ) {
+    ): MeshBuilder {
         val xGridSize = meshGrid.size
         val yGridSize = meshGrid[0].size
         LOG.debug("Render grid: mesh=<{}> grid=<{}x{}>, wrapXY<{},{}> isTextured=<{}>",
@@ -127,6 +171,7 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
             renderMesh(texGrid, false, false)
             supressNormals(false)
         }
+        return this
     }
 
     /**
@@ -174,20 +219,20 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
      * @param color Cylinder color
      */
     fun addCylinderMeshXZ(
-        position: Point3f, radius: Float, height: Float, sides: Int,
-        color: Color?,
-    ) {
+        position: Point3f, radius: Float, height: Float, sides: Int, color: Color?,
+    ): MeshBuilder {
         val bottomPos = Point3f(position)
         bottomPos.sub(Point3f(0f, height, 0f))
 
         // add cylinder
-        val cylinderGrid: Array<Array<MeshVertex>> = arrayOf(addCircleVerticesXZ(position, radius, sides, color),
-            addCircleVerticesXZ(bottomPos, radius, sides, color))
+        val cylinderGrid: Array<Array<MeshVertex>> = arrayOf(newCircleVerticesXZ(position, radius, sides, color),
+            newCircleVerticesXZ(bottomPos, radius, sides, color))
         addLathe(cylinderGrid, false)
 
         // add top and bottom
         addDiscXZ(position, radius, sides, color)
         addDiscXZ(bottomPos, -1 * radius, sides, color)
+        return this
     }
 
     /**
@@ -197,13 +242,13 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
      * @param sides Number of vertices for the sides
      * @param color Disc color
      */
-    fun addDiscXZ(position: Point3f, radius: Float, sides: Int, color: Color?) {
+    fun addDiscXZ(position: Point3f, radius: Float, sides: Int, color: Color?): MeshBuilder {
         // add center point
         val centerVtx = newVertex(position)
         centerVtx.color = color
 
         // create vertices for the boundary
-        val discVertices = addCircleVerticesXZ(position, radius, sides, color)
+        val discVertices = newCircleVerticesXZ(position, radius, sides, color)
 
         // add triangles to fill
         for (rIdx in 1 until sides) {
@@ -212,59 +257,37 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
             addTriangle(curVtx!!, lastVtx!!, centerVtx!!)
         }
         addTriangle(discVertices[0]!!, discVertices[sides - 1]!!, centerVtx!!)
+        return this
     }
 
-    /**
-     * Generate a vertex array for a circle oriented in XZ.
-     * @param position Location of the center of the circle
-     * @param radius Radius of the circle
-     * @param sides Number of sides
-     * @param color Color of the vertices
-     */
-    fun addCircleVerticesXZ(
-        position: Point3f, radius: Float, sides: Int,
-        color: Color?,
-    ): Array<MeshVertex> {
-        var flip = 1f
-        var finalRadius = radius
-        if (radius < 0) {
-            // flip orientation for triangle culling
-            flip *= -1f
-            finalRadius *= -1f
-        }
-        // draw a radial section
-        return (0 until sides).map { rIdx ->
-            val angle = 2 * Math.PI * rIdx * flip / sides
-            val xPos = (sin(angle) * finalRadius + position.x).toFloat()
-            val yPos = (cos(angle) * finalRadius + position.z).toFloat()
-            val vertex = newVertex(Point3f(xPos, position.y, yPos))
-            vertex.color = color
-            return@map vertex
-        }.toTypedArray()
+
+}
+
+/**
+ * Generate a vertex array for a circle oriented in XZ.
+ * @param position Location of the center of the circle
+ * @param radius Radius of the circle
+ * @param sides Number of sides
+ * @param color Color of the vertices
+ */
+fun MeshBuilder.newCircleVerticesXZ(
+    position: Point3f, radius: Float, sides: Int,
+    color: Color?,
+): Array<MeshVertex> {
+    var flip = 1f
+    var finalRadius = radius
+    if (radius < 0) {
+        // flip orientation for triangle culling
+        flip *= -1f
+        finalRadius *= -1f
     }
-
-    companion object {
-
-        /**
-         * Helper function for interpolation between bounds returning a float.
-         * @param max Maximum bound
-         * @param part Number of parts
-         * @param idx Part index
-         * @return float representing position given by the index.
-         */
-        fun interpolateFloat(max: Int, part: Float, idx: Int): Float {
-            return (idx * part / max)
-        }
-
-        /**
-         * Helper function for interpolation between bounds returning an int.
-         * @param max Maximum bound
-         * @param part Number of parts
-         * @param idx Part index
-         * @return rounded integer representing position given by the index.
-         */
-        fun interpolateInt(max: Int, part: Float, idx: Int): Int {
-            return (idx * part / max).roundToInt()
-        }
-    }
+    // draw a radial section
+    return (0 until sides).map { rIdx ->
+        val angle = 2 * Math.PI * rIdx * flip / sides
+        val xPos = (sin(angle) * finalRadius + position.x).toFloat()
+        val yPos = (cos(angle) * finalRadius + position.z).toFloat()
+        val vertex = newVertex(Point3f(xPos, position.y, yPos))
+        vertex.color = color
+        return@map vertex
+    }.toTypedArray()
 }

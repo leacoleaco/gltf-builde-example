@@ -6,6 +6,7 @@ import org.junit.Test
 import org.slf4j.LoggerFactory
 import pro.leaco.gltf.MeshBuilder
 import pro.leaco.gltf.MeshVertex
+import pro.leaco.gltf.buildNodeWith
 import java.io.File
 import java.lang.Exception
 import javax.vecmath.Point2f
@@ -19,112 +20,129 @@ class TestCubeModel {
     @Test
     @Throws(Exception::class)
     fun testCube() {
-        val geoWriter = GltfBuilder()
-
-        // set the path used for finding textures
-        geoWriter.setBasePath(File("src/test/resources"))
+        val builder = GltfBuilder()
+            // set the path used for finding textures
+            .withBasePath(File("src/test/resources"))
 
         // create materials for each of the textures
-        val kineticaMaterial: Material = geoWriter.newTextureMaterial("kinetica_logo.png")
-        val gltfMaterial: Material = geoWriter.newTextureMaterial("gltf_logo.png")
-        val uvGridMaterial: Material = geoWriter.newTextureMaterial("uv_grid_512.png")
-        var meshBuilder = MeshBuilder("face-XY1")
-        var meshGrid: Array<Array<MeshVertex>> =
-            arrayOf(
-                arrayOf(
-                    meshBuilder.newVertex(Point3f(1f, 1f, 0f)),
-                    meshBuilder.newVertex(Point3f(1f, 0f, 0f))
-                ),
-                arrayOf(
-                    meshBuilder.newVertex(Point3f(0f, 1f, 0f)),
-                    meshBuilder.newVertex(Point3f(0f, 0f, 0f))
-                )
-            )
-        meshBuilder.setMaterial(kineticaMaterial)
-        meshBuilder.addPlane(meshGrid, true)
-        meshBuilder.build(geoWriter)
-        meshBuilder = MeshBuilder("face-XY2")
+        val kineticaMaterial: Material = builder.newTextureMaterial("kinetica_logo.png")
+        val gltfMaterial: Material = builder.newTextureMaterial("gltf_logo.png")
+        val uvGridMaterial: Material = builder.newTextureMaterial("uv_grid_512.png")
 
-        arrayOf(
-            arrayOf(
-                meshBuilder.newVertex(Point3f(0f, 1f, -1f)),
-                meshBuilder.newVertex(Point3f(0f, 0f, -1f)),
-            ),
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 1f, -1f)),
-                meshBuilder.newVertex(Point3f(1f, 0f, -1f)),
-            )
+
+        builder.buildNodeWith(
+            MeshBuilder("face-XY1")
+                .withMaterial(kineticaMaterial)
+                .addPlane(true) {
+                    arrayOf(
+                        arrayOf(
+                            newVertex(Point3f(1f, 1f, 0f)),
+                            newVertex(Point3f(1f, 0f, 0f))
+                        ),
+                        arrayOf(
+                            newVertex(Point3f(0f, 1f, 0f)),
+                            newVertex(Point3f(0f, 0f, 0f))
+                        )
+                    )
+                }
         )
 
-        meshBuilder.setMaterial(kineticaMaterial)
-        meshBuilder.addPlane(meshGrid, true)
-        meshBuilder.build(geoWriter)
-        meshBuilder = MeshBuilder("face-YZ1")
 
-        arrayOf(
-            arrayOf(
-                meshBuilder.newVertex(Point3f(0f, 1f, 0f)),
-                meshBuilder.newVertex(Point3f(0f, 0f, 0f)),
-            ),
-            arrayOf(
-                meshBuilder.newVertex(Point3f(0f, 1f, -1f)),
-                meshBuilder.newVertex(Point3f(0f, 0f, -1f)),
-            )
+        builder.buildNodeWith(
+            MeshBuilder("face-XY2")
+                .withMaterial(kineticaMaterial)
+                .addPlane(true) {
+                    arrayOf(
+                        arrayOf(
+                            newVertex(Point3f(0f, 1f, -1f)),
+                            newVertex(Point3f(0f, 0f, -1f)),
+                        ),
+                        arrayOf(
+                            newVertex(Point3f(1f, 1f, -1f)),
+                            newVertex(Point3f(1f, 0f, -1f)),
+                        )
+                    )
+                }
         )
 
-        meshBuilder.setMaterial(gltfMaterial)
-        meshBuilder.addPlane(meshGrid, true)
-        meshBuilder.build(geoWriter)
-        meshBuilder = MeshBuilder("face-YZ2")
 
-        arrayOf(
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 1f, -1f)),
-                meshBuilder.newVertex(Point3f(1f, 0f, -1f)),
-            ),
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 1f, 0f)),
-                meshBuilder.newVertex(Point3f(1f, 0f, 0f)),
-            )
+        builder.buildNodeWith(
+            MeshBuilder("face-YZ1")
+                .withMaterial(gltfMaterial)
+                .addPlane(true) {
+                    arrayOf(
+                        arrayOf(
+                            newVertex(Point3f(0f, 1f, 0f)),
+                            newVertex(Point3f(0f, 0f, 0f)),
+                        ),
+                        arrayOf(
+                            newVertex(Point3f(0f, 1f, -1f)),
+                            newVertex(Point3f(0f, 0f, -1f)),
+                        )
+                    )
+                }
         )
 
-        meshBuilder.setMaterial(gltfMaterial)
-        meshBuilder.addPlane(meshGrid, true)
-        meshBuilder.build(geoWriter)
-        meshBuilder = MeshBuilder("face-Top")
 
-        arrayOf(
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 1f, 0f)),
-                meshBuilder.newVertex(Point3f(0f, 1f, 0f)),
-            ),
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 1f, -1f)),
-                meshBuilder.newVertex(Point3f(0f, 1f, -1f)),
-            )
+
+        builder.buildNodeWith(
+            MeshBuilder("face-YZ2")
+                .withMaterial(gltfMaterial)
+                .addPlane(true) {
+                    arrayOf(
+                        arrayOf(
+                            newVertex(Point3f(1f, 1f, -1f)),
+                            newVertex(Point3f(1f, 0f, -1f)),
+                        ),
+                        arrayOf(
+                            newVertex(Point3f(1f, 1f, 0f)),
+                            newVertex(Point3f(1f, 0f, 0f)),
+                        )
+                    )
+                }
         )
 
-        meshBuilder.setMaterial(uvGridMaterial)
-        meshBuilder.addPlane(meshGrid, true)
-        meshBuilder.build(geoWriter)
-        meshBuilder = MeshBuilder("face-Bottom")
 
-        arrayOf(
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 0f, -1f)),
-                meshBuilder.newVertex(Point3f(0f, 0f, -1f)),
-            ),
-            arrayOf(
-                meshBuilder.newVertex(Point3f(1f, 0f, 0f)),
-                meshBuilder.newVertex(Point3f(0f, 0f, 0f)),
-            )
+
+
+        builder.buildNodeWith(
+            MeshBuilder("face-Top")
+                .withMaterial(uvGridMaterial)
+                .addPlane(true) {
+                    arrayOf(
+                        arrayOf(
+                            newVertex(Point3f(1f, 1f, 0f)),
+                            newVertex(Point3f(0f, 1f, 0f)),
+                        ),
+                        arrayOf(
+                            newVertex(Point3f(1f, 1f, -1f)),
+                            newVertex(Point3f(0f, 1f, -1f)),
+                        )
+                    )
+                }
         )
 
-        meshBuilder.setMaterial(uvGridMaterial)
-        meshBuilder.addPlane(meshGrid, true)
-        meshBuilder.build(geoWriter)
+
+        builder.buildNodeWith(
+            MeshBuilder("face-Bottom")
+                .withMaterial(uvGridMaterial)
+                .addPlane(true) {
+                    arrayOf(
+                        arrayOf(
+                            newVertex(Point3f(1f, 0f, -1f)),
+                            newVertex(Point3f(0f, 0f, -1f)),
+                        ),
+                        arrayOf(
+                            newVertex(Point3f(1f, 0f, 0f)),
+                            newVertex(Point3f(0f, 0f, 0f)),
+                        )
+                    )
+                }
+        )
+
+
         val outFile: File = TestShapeModels.getFile("test_cube")
-        geoWriter.writeGltf(outFile)
+        builder.writeGltf(outFile)
         LOG.info("Finished generating: {}", outFile)
     }
 
@@ -138,7 +156,7 @@ class TestCubeModel {
         val geoWriter = GltfBuilder()
 
         // set the path used for finding textures
-        geoWriter.setBasePath(File("src/test/resources"))
+        geoWriter.withBasePath(File("src/test/resources"))
 
         // create materials for each of the textures
         val kineticaMaterial: Material = geoWriter.newTextureMaterial("kinetica_logo.png")
@@ -155,7 +173,7 @@ class TestCubeModel {
         vertexXY1_1.texCoord = Point2f(0f, 1f)
         vertexXY1_2.texCoord = Point2f(1f, 0f)
         vertexXY1_3.texCoord = Point2f(0f, 0f)
-        meshBuilder.setMaterial(kineticaMaterial)
+        meshBuilder.withMaterial(kineticaMaterial)
         meshBuilder.build(geoWriter)
         meshBuilder = MeshBuilder("face-XY2")
         val vertexXY2_0: MeshVertex = meshBuilder.newVertex(Point3f(1f, 0f, -1f))
@@ -167,7 +185,7 @@ class TestCubeModel {
         vertexXY2_1.texCoord = Point2f(0f, 1f)
         vertexXY2_2.texCoord = Point2f(1f, 0f)
         vertexXY2_3.texCoord = Point2f(0f, 0f)
-        meshBuilder.setMaterial(kineticaMaterial)
+        meshBuilder.withMaterial(kineticaMaterial)
         meshBuilder.build(geoWriter)
         meshBuilder = MeshBuilder("face-YZ1")
         val vertexYZ1_0: MeshVertex = meshBuilder.newVertex(Point3f(0f, 0f, -1f))
@@ -179,7 +197,7 @@ class TestCubeModel {
         vertexYZ1_1.texCoord = Point2f(0f, 1f)
         vertexYZ1_2.texCoord = Point2f(1f, 0f)
         vertexYZ1_3.texCoord = Point2f(0f, 0f)
-        meshBuilder.setMaterial(gltfMaterial)
+        meshBuilder.withMaterial(gltfMaterial)
         meshBuilder.build(geoWriter)
         meshBuilder = MeshBuilder("face-YZ2")
         val vertexYZ2_0: MeshVertex = meshBuilder.newVertex(Point3f(1f, 0f, 0f))
@@ -191,7 +209,7 @@ class TestCubeModel {
         vertexYZ2_1.texCoord = Point2f(0f, 1f)
         vertexYZ2_2.texCoord = Point2f(1f, 0f)
         vertexYZ2_3.texCoord = Point2f(0f, 0f)
-        meshBuilder.setMaterial(gltfMaterial)
+        meshBuilder.withMaterial(gltfMaterial)
         meshBuilder.build(geoWriter)
         meshBuilder = MeshBuilder("face-Top")
         val vertexTop_0: MeshVertex = meshBuilder.newVertex(Point3f(0f, 1f, 0f))
@@ -203,7 +221,7 @@ class TestCubeModel {
         vertexTop_1.texCoord = Point2f(0f, 1f)
         vertexTop_2.texCoord = Point2f(1f, 0f)
         vertexTop_3.texCoord = Point2f(0f, 0f)
-        meshBuilder.setMaterial(uvGridMaterial)
+        meshBuilder.withMaterial(uvGridMaterial)
         meshBuilder.build(geoWriter)
         meshBuilder = MeshBuilder("face-Bottom")
         val vertexBottom_0: MeshVertex = meshBuilder.newVertex(Point3f(0f, 0f, 0f))
@@ -215,7 +233,7 @@ class TestCubeModel {
         vertexBottom_1.texCoord = Point2f(0f, 1f)
         vertexBottom_2.texCoord = Point2f(1f, 0f)
         vertexBottom_3.texCoord = Point2f(0f, 0f)
-        meshBuilder.setMaterial(uvGridMaterial)
+        meshBuilder.withMaterial(uvGridMaterial)
         meshBuilder.build(geoWriter)
         val outFile: File = TestShapeModels.getFile("test_cube2")
         geoWriter.writeGltf(outFile)

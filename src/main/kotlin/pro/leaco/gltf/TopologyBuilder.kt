@@ -135,14 +135,14 @@ open class TopologyBuilder(
         buildBuffers(geoWriter, meshPrimitive)
         val mesh = Mesh()
         geoWriter.gltf.addMeshes(mesh)
-        mesh.name = name + "-mesh"
+        mesh.name = "$name-mesh"
         val meshIdx: Int = geoWriter.gltf.getMeshes().indexOf(mesh)
         LOG.debug("New Mesh[{}]: idx=<{}>", mesh.name, meshIdx)
         mesh.addPrimitives(meshPrimitive)
         val node = Node()
         geoWriter.addNode(node)
         node.mesh = meshIdx
-        node.name = name + "-node"
+        node.name = "$name-node"
         return node
     }
 

@@ -7,13 +7,16 @@ import org.junit.Test
 import org.slf4j.LoggerFactory
 import pro.leaco.gltf.MeshVertex
 import pro.leaco.gltf.TopologyBuilder
+import pro.leaco.gltf.buildNodeWith
 import java.awt.Color
 import java.io.File
 import java.lang.Exception
 import javax.vecmath.Point3f
+import kotlin.math.cos
+import kotlin.math.sin
 
 class TestLineModels {
-    private val geoWriter: GltfBuilder = GltfBuilder()
+    private val builder: GltfBuilder = GltfBuilder()
 
     /**
      * Draw a sphere using the line strip topology.
@@ -33,24 +36,24 @@ class TestLineModels {
             val angleTheta = part * Math.PI
 
             // convert to Cartesian
-            val radius = Math.sin(angleTheta).toFloat().toDouble()
-            val xPos = (radius * Math.cos(anglePhi)).toFloat()
-            val yPos = (radius * Math.sin(anglePhi)).toFloat()
-            val zPos = Math.cos(angleTheta).toFloat()
+            val radius = sin(angleTheta).toFloat().toDouble()
+            val xPos = (radius * cos(anglePhi)).toFloat()
+            val yPos = (radius * sin(anglePhi)).toFloat()
+            val zPos = cos(angleTheta).toFloat()
             val point = Point3f(xPos, yPos, zPos)
             val vertex: MeshVertex = meshBuilder.newVertex(point)
             val color: Color = Color.getHSBColor(part.toFloat(), 0.6f, 0.5f)
             vertex.color = color
         }
-        val node: Node = meshBuilder.build(geoWriter)
+        val node = builder.buildNodeWith(meshBuilder)
 
         // example of adding custom data to MeshPrimitive
         val meshIdx = node.mesh
-        val mesh: Mesh = geoWriter.gltf.meshes[meshIdx]
+        val mesh: Mesh = builder.gltf.meshes[meshIdx]
         val primitive = mesh.primitives[0]
         primitive.extras = arrayOf("some", "additional", "data")
         val outFile: File = TestShapeModels.Companion.getFile(meshBuilder.name)
-        geoWriter.writeGltf(outFile)
+        builder.writeGltf(outFile)
         LOG.info("Finished generating: {}", outFile)
     }
 

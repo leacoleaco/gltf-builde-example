@@ -12,6 +12,7 @@ import javax.vecmath.Point2f
 import javax.vecmath.Vector3f
 
 private val LOG = KotlinLogging.logger {}
+
 /**
  * Build 3D Geometry from triangles or squares. Tangents, indices, and normals are automatically
  * generated.
@@ -46,22 +47,11 @@ open class TriangleBuilder(name: String) : TopologyBuilder(name, TopologyMode.TR
      * @param material Material from the GltfBuilder
      * @see GltfBuilder.newTextureMaterial
      */
-    fun setMaterial(material: Material?) {
+    open fun withMaterial(material: Material): TriangleBuilder {
         this.material = material
+        return this
     }
 
-    /**
-     * This method should be called when all shapes have added. It will serialize the MeshVertex
-     * list and indices to buffers.
-     * @param material Material from the GltfBuilder
-     * @see GltfBuilder.newTextureMaterial
-     */
-    @Deprecated("Use {@link #setMaterial(Material)} instead")
-    @Throws(Exception::class)
-    fun build(geoWriter: GltfBuilder, material: Material?): Node? {
-        setMaterial(material)
-        return build(geoWriter)
-    }
 
     /**
      * Add a 3D triangle specified by 3 vertices. All triangles should be added through this

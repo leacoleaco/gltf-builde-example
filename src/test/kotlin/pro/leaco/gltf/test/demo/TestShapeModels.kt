@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory
 import pro.leaco.gltf.GltfBuilder
 import pro.leaco.gltf.MeshBuilder
 import pro.leaco.gltf.MeshVertex
+import pro.leaco.gltf.newCircleVerticesXZ
 import java.awt.Color
 import java.io.File
 import java.nio.file.Paths
 import javax.vecmath.Point3f
+import kotlin.math.exp
 
 class TestShapeModels {
     private val geoWriter: GltfBuilder = GltfBuilder()
@@ -18,7 +20,7 @@ class TestShapeModels {
     @Before
     fun setup() {
         // set the path where the texture files will be found
-        geoWriter.setBasePath(File("src/test/resources"))
+        geoWriter.withBasePath(File("src/test/resources"))
     }
 
     /**
@@ -32,7 +34,7 @@ class TestShapeModels {
         geoWriter.alphaMode = GltfBuilder.AlphaMode.OPAQUE_DS
         val meshBuilder = MeshBuilder("test_plane")
         val material: Material = geoWriter.newTextureMaterial(TEST_TEXTURE_PNG)
-        meshBuilder.setMaterial(material)
+        meshBuilder.withMaterial(material)
 
         // size of grid
         val length = 30
@@ -40,8 +42,8 @@ class TestShapeModels {
         // size of coordinates
         val coordLength = 4f
 
-        // grid to hold mesh points
-        val meshGrid: Array<Array<MeshVertex>> =
+        // render the vertices in the grid
+        meshBuilder.addPlane(true) {
             (0 until length).map { xIdx ->
                 // interpolate to within the range [-2,2]
                 val xPos: Float = MeshBuilder.interpolateFloat(length, coordLength, xIdx) - coordLength / 2f
@@ -50,16 +52,14 @@ class TestShapeModels {
                     val zPos: Float = MeshBuilder.interpolateFloat(length, coordLength, yIdx) - coordLength / 2f
 
                     // calculate the function 2*x*exp(-(x^2 + y^2))
-                    val yPos = (2 * xPos * Math.exp((-1 * (xPos * xPos + zPos * zPos)).toDouble())).toFloat()
+                    val yPos = (2 * xPos * exp((-1 * (xPos * xPos + zPos * zPos)).toDouble())).toFloat()
 
                     // add the point in the mesh
                     val point = Point3f(-1 * xPos, yPos, zPos)
                     meshBuilder.newVertex(point)
                 }.toTypedArray()
             }.toTypedArray()
-
-        // render the vertices in the grid
-        meshBuilder.addPlane(meshGrid, true)
+        }
 
         // build the gltf buffers
         meshBuilder.build(geoWriter)
@@ -77,7 +77,7 @@ class TestShapeModels {
     fun testDiamond() {
         val meshBuilder = MeshBuilder("test_diamond")
         val material: Material = geoWriter.newDefaultMaterial()
-        meshBuilder.setMaterial(material)
+        meshBuilder.withMaterial(material)
 
         // number of sides around the tube
         val sides = 12
@@ -95,7 +95,7 @@ class TestShapeModels {
             // create a rainbow effect along the y axis
             val color: Color = Color.getHSBColor(yIdx.toFloat() / yPosList.size.toFloat(), 0.9f, 1.0f)
             // add a circle that is part of the tube
-            return@map meshBuilder.addCircleVerticesXZ(circlePos, radius, sides, color)
+            return@map meshBuilder.newCircleVerticesXZ(circlePos, radius, sides, color)
         }.toTypedArray()
 
 
