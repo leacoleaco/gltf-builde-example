@@ -296,9 +296,9 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
         for (rIdx in 1 until sides) {
             val curVtx = discVertices[rIdx]
             val lastVtx = discVertices[rIdx - 1]
-            addTriangle(curVtx!!, lastVtx!!, centerVtx!!)
+            addTriangle(curVtx, lastVtx, centerVtx)
         }
-        addTriangle(discVertices[0]!!, discVertices[sides - 1]!!, centerVtx!!)
+        addTriangle(discVertices[0], discVertices[sides - 1], centerVtx)
         return this
     }
 

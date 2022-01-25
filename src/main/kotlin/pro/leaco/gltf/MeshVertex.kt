@@ -13,7 +13,7 @@ private val LOG = KotlinLogging.logger {}
  * Contains details for a vertex in a 3D mesh.
  * @author Leaco
  */
-class MeshVertex {
+open class MeshVertex {
 
     /**
      * Get the index of this vertex for use in TriangleIndices.
@@ -43,6 +43,7 @@ class MeshVertex {
             vertex.x, vertex.y, vertex.z,
             normals.size)
     }
+
 
     /**
      * Create copy of a vertex
@@ -100,6 +101,22 @@ class MeshVertex {
         tangents.add(vec)
     }// create a fake normal// calculate an average normal
 
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MeshVertex
+
+        if (index != other.index) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return index
+    }
+
     /**
      * Calculate the average of the normal vectors.
      */
@@ -132,9 +149,9 @@ class MeshVertex {
      */
     @get:Throws(Exception::class)
     protected val tangent: Vector4f
-        protected get() {
+        get() {
             if (normals.size == 0) {
-                throw Exception("No tangents to average for vertex: " + index)
+                throw Exception("No tangents to average for vertex: $index")
             }
             val avgTangent = Vector3f()
 

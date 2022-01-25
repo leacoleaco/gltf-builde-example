@@ -102,7 +102,7 @@ open class TopologyBuilder(
      * an unique index that will be referenced when adding squares or triangles.
      * @param vertex 3D location of this vertex.
      */
-    fun newVertex(vertex: Point3f?): MeshVertex {
+    fun newVertex(vertex: Point3f): MeshVertex {
         val newVertex = Point3f(vertex)
 
         // apply offset and scale

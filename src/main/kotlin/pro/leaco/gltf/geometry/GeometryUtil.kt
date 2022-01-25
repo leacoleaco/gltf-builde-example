@@ -71,14 +71,14 @@ fun LinearRing.toPolygon(): Polygon {
 }
 
 
-fun <T : Geometry> T.conformingDelaunayTriangles(): List<Geometry> {
+fun <T : Geometry> T.conformingDelaunayTriangles(): List<Polygon> {
     val builder = ConformingDelaunayTriangulationBuilder()
     builder.setSites(this)
     val triangles = builder.getTriangles(GeometryMaker.f)
-    return triangles.getSubGeometries()
+    return triangles.getSubGeometries().map { it as Polygon }
 }
 
-fun <T : Geometry> T.conformingDelaunayTrianglesWithoutHole(): List<Geometry> {
+fun <T : Geometry> T.conformingDelaunayTrianglesWithoutHole(): List<Polygon> {
     return this.conformingDelaunayTriangles().filter { this.contains(it) }
 }
 
