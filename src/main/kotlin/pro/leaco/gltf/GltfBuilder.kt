@@ -257,7 +257,7 @@ class GltfBuilder {
     }
 
     private fun resolveImages(gltfAsset: GltfAssetV2) {
-        val refList: List<GltfReference> = gltfAsset.getImageReferences()
+        val refList: List<GltfReference> = gltfAsset.imageReferences
         val baseUri: URI = Paths.get(basePath).toAbsolutePath().toUri()
         GltfReferenceResolver.resolveAll(refList, baseUri)
 //        val refDatas: Map<String, ByteBuffer> = gltfAsset.getReferenceDatas()

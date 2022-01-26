@@ -15,7 +15,7 @@ private val LOG = KotlinLogging.logger {}
  * Generate 3D meshes for glTF based on 2D grid arrays
  * @author Leaco
  */
-class MeshBuilder(name: String) : TriangleBuilder(name) {
+open class MeshBuilder(name: String) : TriangleBuilder(name) {
     companion object {
 
         /**
@@ -150,8 +150,6 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
             wrapY,
             isTextured)
 
-        // generate geometry and add normals for non-textured manifold.
-        renderMesh(meshGrid, wrapY, wrapX)
         if (isTextured) {
             // At this point the mesh is complete with correct normals except that we have no
             // texture coordinates.
@@ -211,6 +209,9 @@ class MeshBuilder(name: String) : TriangleBuilder(name) {
             supressNormals(true)
             renderMesh(texGrid, wrapY = false, wrapX = false)
             supressNormals(false)
+        } else {
+            // generate geometry and add normals for non-textured manifold.
+            renderMesh(meshGrid, wrapY, wrapX)
         }
         return this
     }

@@ -2,7 +2,6 @@ package pro.leaco.gltf
 
 import de.javagl.jgltf.impl.v2.Material
 import de.javagl.jgltf.impl.v2.MeshPrimitive
-import de.javagl.jgltf.impl.v2.Node
 import mu.KotlinLogging
 import pro.leaco.gltf.buffer.Normals
 import pro.leaco.gltf.buffer.Tangents
@@ -20,20 +19,15 @@ private val LOG = KotlinLogging.logger {}
  */
 open class TriangleBuilder(name: String) : TopologyBuilder(name, TopologyMode.TRIANGLES) {
     /** The indices keep track of connectivity between triangle vertices.  */
-    protected val indices: TriangleIndices
+    val indices: TriangleIndices = TriangleIndices(name)
 
     /** Suppress additions of normal vectors   */
-    private var supressNormals = false
+    var supressNormals = false
+        protected set
 
     /** Material for the mesh  */
     private var material: Material? = null
 
-    /**
-     * @param name Name of the glTF mesh node.
-     */
-    init {
-        indices = TriangleIndices(name)
-    }
 
     /**
      * Enable or disable suppression of normals.
@@ -71,8 +65,7 @@ open class TriangleBuilder(name: String) : TopologyBuilder(name, TopologyMode.TR
             normal.cross(vec21, vec01)
             normal.normalize()
             if (java.lang.Float.isNaN(normal.x) || java.lang.Float.isNaN(normal.y) || java.lang.Float.isNaN(normal.z)) {
-                LOG.debug("Could not calculate normal for triangle: {},{},{}",
-                    vtx0.index, vtx1.index, vtx2.index)
+                LOG.debug("Could not calculate normal for triangle: {},{},{}", vtx0.index, vtx1.index, vtx2.index)
                 // create a fake normal
                 normal = Vector3f(1f, 1f, 1f)
                 normal.normalize()
