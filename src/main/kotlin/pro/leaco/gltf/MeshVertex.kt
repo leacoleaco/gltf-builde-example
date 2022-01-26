@@ -16,13 +16,12 @@ private val LOG = KotlinLogging.logger {}
 open class MeshVertex {
 
     /**
-     * Get the index of this vertex for use in TriangleIndices.
-     */
-    /** index to be used in the indices list.  */
+     * index to be used in the indices list.
+     * */
     val index: Int
 
     /**
-     * Get the position of this vertex.
+     * the position of this vertex.
      */
     val vertex: Point3f
 
@@ -56,8 +55,8 @@ open class MeshVertex {
         if (mv.color != null) {
             color = mv.color
         }
-        if (mv.texCoord != null) {
-            texCoord = Point2f(mv.texCoord)
+        if (mv.textureCoordinate != null) {
+            textureCoordinate = Point2f(mv.textureCoordinate)
         }
         for (normal in mv.normals) {
             normals.add(Vector3f(normal))
@@ -69,22 +68,14 @@ open class MeshVertex {
 
 
     /**
-     * Get the vertex color.
-     * @return null if no color
-     */
-    /**
-     * Set the vertex color.
+     * the vertex color.
      */
     var color: Color? = null
 
     /**
-     * Get the texture coordinate of this vertex.
-     * @return null if no coordinate
+     * the texture coordinate of this vertex.
      */
-    /**
-     * Set the texture coordinate of this vertex.
-     */
-    var texCoord: Point2f? = null
+    var textureCoordinate: Point2f? = null
 
 
     /**

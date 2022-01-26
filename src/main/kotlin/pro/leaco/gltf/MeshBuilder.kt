@@ -197,7 +197,7 @@ open class MeshBuilder(name: String) : TriangleBuilder(name) {
                         vertex = meshGrid[xGridIdx][yGridIdx]
                     }
                     val vPos = interpolateFloat(yTexSize - 1, 1.0f, yGridIdx)
-                    vertex.texCoord = Point2f(uPos, vPos)
+                    vertex.textureCoordinate = Point2f(uPos, vPos)
 
                     // Assign the vertex to the texture grid.
                     vertex

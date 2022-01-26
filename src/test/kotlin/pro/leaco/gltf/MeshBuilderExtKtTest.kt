@@ -23,7 +23,9 @@ class MeshBuilderExtKtTest {
         val geom =
             GeometryMaker.parse("POLYGON ((90 370, 300 370, 300 120, 90 120, 90 370), \n" + "  (180 290, 150 200, 250 200, 185 226, 180 290))")
 
-        builder.buildNodeWith(MeshBuilder("face-XY1").withMaterial(kineticaMaterial).addGeometryPlane(geom, true))
+        builder.buildNodeWith(MeshBuilder("face-XY1")
+            .withMaterial(kineticaMaterial)
+            .addGeometryPlane(geom, true))
 
         val outFile: File = TestShapeModels.getFile("test_geom")
         builder.writeGltf(outFile)

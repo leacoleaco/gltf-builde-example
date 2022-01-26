@@ -118,7 +118,7 @@ open class TriangleBuilder(name: String) : TopologyBuilder(name, TopologyMode.TR
         val normals = Normals(this.name)
         val tangents = Tangents(this.name)
         for (meshVertex in vertexList) {
-            val texCoord: Point2f? = meshVertex.texCoord
+            val texCoord: Point2f? = meshVertex.textureCoordinate
             if (texCoord != null) {
                 textureCoordinates.add(texCoord)
             }
